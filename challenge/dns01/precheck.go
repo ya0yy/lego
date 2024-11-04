@@ -57,7 +57,11 @@ func (p preCheck) checkDNSPropagation(fqdn, value string) (bool, error) {
 	// Initial attempt to resolve at the recursive NS
 	r, err := dnsQuery(fqdn, dns.TypeTXT, recursiveNameservers, true)
 	if err != nil {
-		return false, err
+		if r != nil && r.Rcode != dns.RcodeNameError {
+			log.Warnf("may error %v in query dns_.", err)
+		} else {
+			return false, err
+		}
 	}
 
 	if !p.requireCompletePropagation {
