@@ -3,6 +3,7 @@ package dns01
 import (
 	"errors"
 	"fmt"
+	"github.com/go-acme/lego/v4/log"
 	"net"
 	"os"
 	"slices"
@@ -237,6 +238,9 @@ func dnsQuery(fqdn string, rtype uint16, nameservers []string, recursive bool) (
 
 	for _, ns := range nameservers {
 		r, err = sendDNSQuery(m, ns)
+		if err != nil {
+			log.Warnf("could not send DNS query for '%s': %v", ns, err)
+		}
 		if err == nil && len(r.Answer) > 0 {
 			break
 		}
