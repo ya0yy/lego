@@ -46,10 +46,8 @@ func newPreCheck() preCheck {
 
 func (p preCheck) call(domain, fqdn, value string) (bool, error) {
 	if p.checkFunc == nil {
-		log.Infof("[%s] checkFunc is nil", domain)
 		return p.checkDNSPropagation(fqdn, value)
 	}
-
 	log.Infof("[%s] checkFunc is not nil", domain)
 	return p.checkFunc(domain, fqdn, value, p.checkDNSPropagation)
 }
@@ -83,7 +81,11 @@ func checkAuthoritativeNss(fqdn, value string, nameservers []string) (bool, erro
 	for _, ns := range nameservers {
 		r, err := dnsQuery(fqdn, dns.TypeTXT, []string{net.JoinHostPort(ns, "53")}, false)
 		if err != nil {
-			return false, err
+			if r != nil && r.Rcode != dns.RcodeNameError {
+				log.Warnf("may error %v in query dns.", err)
+			} else {
+				return false, err
+			}
 		}
 
 		if r.Rcode != dns.RcodeSuccess {
