@@ -1,4 +1,4 @@
-module github.com/ya0yy/lego/v4
+module github.com/ya0yy/lego
 
 go 1.22.0
 
