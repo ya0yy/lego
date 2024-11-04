@@ -2,6 +2,7 @@ package dns01
 
 import (
 	"fmt"
+	"github.com/go-acme/lego/v4/log"
 	"net"
 	"strings"
 
@@ -45,9 +46,11 @@ func newPreCheck() preCheck {
 
 func (p preCheck) call(domain, fqdn, value string) (bool, error) {
 	if p.checkFunc == nil {
+		log.Infof("[%s] checkFunc is nil", domain)
 		return p.checkDNSPropagation(fqdn, value)
 	}
 
+	log.Infof("[%s] checkFunc is not nil", domain)
 	return p.checkFunc(domain, fqdn, value, p.checkDNSPropagation)
 }
 
